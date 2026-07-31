@@ -1,0 +1,11 @@
+function	test_kind	test_source
+p101_mlock	fault	test/test_fault_wrappers.c
+p101_mlockall	fault	test/test_fault_wrappers.c
+p101_mmap	fault	test/test_fault_wrappers.c
+p101_mprotect	fault	test/test_fault_wrappers.c
+p101_msync	fault	test/test_fault_wrappers.c
+p101_munlock	fault	test/test_fault_wrappers.c
+p101_munlockall	fault	test/test_fault_wrappers.c
+p101_munmap	fault	test/test_fault_wrappers.c
+p101_posix_madvise	fault	test/test_fault_wrappers.c
+p101_posix_memalign	fault	test/test_fault_wrappers.c
