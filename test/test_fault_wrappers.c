@@ -2,8 +2,10 @@
 #include <p101_env/env.h>
 #include <p101_error/error.h>
 #include <p101_memory/memory.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static int failures;
 
@@ -65,7 +67,7 @@ static void test_p101_mlock(struct p101_env *env, struct p101_error *err)
 static void test_p101_mlockall(struct p101_env *env, struct p101_error *err)
 {
 #ifdef __linux__
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EINVAL, ENOMEM, EPERM};
 #elif defined(__APPLE__)
     static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
 #elif defined(__FreeBSD__)
@@ -92,7 +94,7 @@ static void test_p101_mlockall(struct p101_env *env, struct p101_error *err)
 static void test_p101_mmap(struct p101_env *env, struct p101_error *err)
 {
 #ifdef __linux__
-    static const int errors[] = {EACCES, EAGAIN, EBADF, EEXIST, EINVAL, ENFILE, ENODEV, ENOMEM, EOVERFLOW, EPERM, ETXTBSY};
+    static const int errors[] = {EIO};
 #elif defined(__APPLE__)
     static const int errors[] = {EACCES, EBADF, EINVAL, ENODEV, ENOMEM, ENXIO, EOVERFLOW};
 #elif defined(__FreeBSD__)
@@ -175,11 +177,11 @@ static void test_p101_munlock(struct p101_env *env, struct p101_error *err)
 #ifdef __linux__
     static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
 #elif defined(__APPLE__)
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM};
+    static const int errors[] = {EINVAL, ENOMEM};
 #elif defined(__FreeBSD__)
     static const int errors[] = {EINVAL, ENOMEM, EPERM};
 #else
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EINVAL, ENOMEM};
 #endif
 
     for(size_t index = 0U; index < sizeof(errors) / sizeof(errors[0]); index++)
@@ -200,13 +202,13 @@ static void test_p101_munlock(struct p101_env *env, struct p101_error *err)
 static void test_p101_munlockall(struct p101_env *env, struct p101_error *err)
 {
 #ifdef __linux__
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EINVAL, ENOMEM, EPERM};
 #elif defined(__APPLE__)
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EIO};
 #elif defined(__FreeBSD__)
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EIO};
 #else
-    static const int errors[] = {EAGAIN, EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EIO};
 #endif
 
     for(size_t index = 0U; index < sizeof(errors) / sizeof(errors[0]); index++)
@@ -256,9 +258,9 @@ static void test_p101_posix_madvise(struct p101_env *env, struct p101_error *err
 #ifdef __linux__
     static const int errors[] = {EINVAL, ENOMEM};
 #elif defined(__APPLE__)
-    static const int errors[] = {EINVAL, ENOMEM, ENOTSUP, EPERM};
+    static const int errors[] = {EIO};
 #elif defined(__FreeBSD__)
-    static const int errors[] = {EINVAL, ENOMEM, EPERM};
+    static const int errors[] = {EIO};
 #else
     static const int errors[] = {EINVAL, ENOMEM};
 #endif
