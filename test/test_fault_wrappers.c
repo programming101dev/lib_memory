@@ -203,8 +203,8 @@ static void test_p101_mmap(struct p101_env *env, struct p101_error *err)
     memset(argument_2, 0xA5, sizeof(argument_2));
     memcpy(argument_2_before, argument_2, sizeof(argument_2));
 #ifdef __linux__
-    static const int         errors[]      = {EIO};
-    static const char *const error_names[] = {"EIO"};
+    static const int         errors[]      = {EACCES, EAGAIN, EBADF, EINVAL, EMFILE, ENODEV, ENOMEM, ENOTSUP, ENXIO, EOVERFLOW};
+    static const char *const error_names[] = {"EACCES", "EAGAIN", "EBADF", "EINVAL", "EMFILE", "ENODEV", "ENOMEM", "ENOTSUP", "ENXIO", "EOVERFLOW"};
 #elif defined(__APPLE__)
     static const int         errors[]      = {EACCES, EBADF, EINVAL, ENODEV, ENOMEM, ENXIO, EOVERFLOW};
     static const char *const error_names[] = {"EACCES", "EBADF", "EINVAL", "ENODEV", "ENOMEM", "ENXIO", "EOVERFLOW"};
@@ -466,11 +466,11 @@ static void test_p101_posix_madvise(struct p101_env *env, struct p101_error *err
     static const int         errors[]      = {EINVAL, ENOMEM};
     static const char *const error_names[] = {"EINVAL", "ENOMEM"};
 #elif defined(__APPLE__)
-    static const int         errors[]      = {EIO};
-    static const char *const error_names[] = {"EIO"};
+    static const int         errors[]      = {EINVAL, ENOMEM};
+    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
 #elif defined(__FreeBSD__)
-    static const int         errors[]      = {EIO};
-    static const char *const error_names[] = {"EIO"};
+    static const int         errors[]      = {EINVAL, ENOMEM};
+    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
 #else
     static const int         errors[]      = {EINVAL, ENOMEM};
     static const char *const error_names[] = {"EINVAL", "ENOMEM"};
@@ -514,8 +514,8 @@ static void test_p101_posix_memalign(struct p101_env *env, struct p101_error *er
     static const int         errors[]      = {EINVAL, ENOMEM};
     static const char *const error_names[] = {"EINVAL", "ENOMEM"};
 #elif defined(__FreeBSD__)
-    static const int         errors[]      = {EIO};
-    static const char *const error_names[] = {"EIO"};
+    static const int         errors[]      = {EINVAL, ENOMEM};
+    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
 #else
     static const int         errors[]      = {EINVAL, ENOMEM};
     static const char *const error_names[] = {"EINVAL", "ENOMEM"};

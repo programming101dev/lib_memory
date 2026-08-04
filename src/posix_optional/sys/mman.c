@@ -23,7 +23,7 @@ int p101_mlock(const struct p101_env *env, struct p101_error *err, const void *a
     int ret_val;
 
     P101_TRACE(env);
-    P101_WRAPPER_FAULT_RETURN(env, err, -1);
+    P101_WRAPPER_FAULT_RETURN(env, err, ret_val, -1);
     errno   = 0;
     ret_val = mlock(addr, len);
 
@@ -32,7 +32,7 @@ int p101_mlock(const struct p101_env *env, struct p101_error *err, const void *a
         P101_ERROR_RAISE_ERRNO(err, errno);
     }
 
-    P101_TRACE_EXIT(env);
+    P101_WRAPPER_DONE(env);
     return ret_val;
 }
 
@@ -41,7 +41,7 @@ int p101_mlockall(const struct p101_env *env, struct p101_error *err, int flags)
     int ret_val;
 
     P101_TRACE(env);
-    P101_WRAPPER_FAULT_RETURN(env, err, -1);
+    P101_WRAPPER_FAULT_RETURN(env, err, ret_val, -1);
     errno   = 0;
     ret_val = mlockall(flags);
 
@@ -50,7 +50,7 @@ int p101_mlockall(const struct p101_env *env, struct p101_error *err, int flags)
         P101_ERROR_RAISE_ERRNO(err, errno);
     }
 
-    P101_TRACE_EXIT(env);
+    P101_WRAPPER_DONE(env);
     return ret_val;
 }
 
@@ -59,7 +59,7 @@ int p101_munlock(const struct p101_env *env, struct p101_error *err, const void 
     int ret_val;
 
     P101_TRACE(env);
-    P101_WRAPPER_FAULT_RETURN(env, err, -1);
+    P101_WRAPPER_FAULT_RETURN(env, err, ret_val, -1);
     errno   = 0;
     ret_val = munlock(addr, len);
 
@@ -68,7 +68,7 @@ int p101_munlock(const struct p101_env *env, struct p101_error *err, const void 
         P101_ERROR_RAISE_ERRNO(err, errno);
     }
 
-    P101_TRACE_EXIT(env);
+    P101_WRAPPER_DONE(env);
     return ret_val;
 }
 
@@ -77,7 +77,7 @@ int p101_munlockall(const struct p101_env *env, struct p101_error *err)
     int ret_val;
 
     P101_TRACE(env);
-    P101_WRAPPER_FAULT_RETURN(env, err, -1);
+    P101_WRAPPER_FAULT_RETURN(env, err, ret_val, -1);
     errno   = 0;
     ret_val = munlockall();
 
@@ -86,7 +86,7 @@ int p101_munlockall(const struct p101_env *env, struct p101_error *err)
         P101_ERROR_RAISE_ERRNO(err, errno);
     }
 
-    P101_TRACE_EXIT(env);
+    P101_WRAPPER_DONE(env);
     return ret_val;
 }
 
@@ -95,7 +95,7 @@ int p101_posix_madvise(const struct p101_env *env, struct p101_error *err, void 
     int ret_val;
 
     P101_TRACE(env);
-    P101_WRAPPER_FAULT_RETURN_CODE(env, err);
+    P101_WRAPPER_FAULT_RETURN_CODE(env, err, ret_val);
     ret_val = posix_madvise(addr, len, advice);
 
     if(ret_val != 0)
@@ -103,6 +103,6 @@ int p101_posix_madvise(const struct p101_env *env, struct p101_error *err, void 
         P101_ERROR_RAISE_ERRNO(err, ret_val);
     }
 
-    P101_TRACE_EXIT(env);
+    P101_WRAPPER_DONE(env);
     return ret_val;
 }

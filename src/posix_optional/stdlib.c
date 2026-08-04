@@ -23,7 +23,7 @@ int p101_posix_memalign(const struct p101_env *env, struct p101_error *err, void
     int ret_val;
 
     P101_TRACE(env);
-    P101_WRAPPER_FAULT_RETURN_CODE(env, err);
+    P101_WRAPPER_FAULT_RETURN_CODE(env, err, ret_val);
     ret_val = posix_memalign(memptr, alignment, size);
 
     if(ret_val != 0)
@@ -35,6 +35,6 @@ int p101_posix_memalign(const struct p101_env *env, struct p101_error *err, void
         P101_TRACK_ALLOC(env, *memptr, size);
     }
 
-    P101_TRACE_EXIT(env);
+    P101_WRAPPER_DONE(env);
     return ret_val;
 }
