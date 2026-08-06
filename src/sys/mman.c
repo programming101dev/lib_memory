@@ -34,7 +34,6 @@
  * limitations under the License.
  */
 
-#include <p101_env/wrapper.h>
 #include <sys/mman.h>
 
 void *p101_mmap(const struct p101_env *env, struct p101_error *err, void *addr, size_t len, int prot, int flags, int fildes, off_t off)
