@@ -19,10 +19,7 @@ set(BSD_STANDARD_FLAGS -D_BSD_SOURCE -D__BSD_VISIBLE)
 
 set(LIBRARY_TARGETS p101_memory)
 set(p101_memory_SOURCES
-        src/posix/sys/mman.c
-        src/posix_optional/stdlib.c
-        src/posix_optional/sys/mman.c
-        src/posix_xsi/sys/mman.c
+        src/memory.c
 )
 set(p101_memory_HEADERS
         include/p101_memory/memory.h
