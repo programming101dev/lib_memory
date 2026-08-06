@@ -10,7 +10,8 @@
 #include <netinet/in.h>
 #include <p101_env/env.h>
 #include <p101_error/error.h>
-#include <p101_memory/memory.h>
+#include <p101_memory/p101_stdlib.h>
+#include <p101_memory/sys/p101_mman.h>
 #include <pthread.h>
 #include <search.h>
 #include <signal.h>

@@ -19,10 +19,12 @@ set(BSD_STANDARD_FLAGS -D_BSD_SOURCE -D__BSD_VISIBLE)
 
 set(LIBRARY_TARGETS p101_memory)
 set(p101_memory_SOURCES
-        src/memory.c
+        src/stdlib.c
+        src/sys/mman.c
 )
 set(p101_memory_HEADERS
-        include/p101_memory/memory.h
+        include/p101_memory/p101_stdlib.h
+        include/p101_memory/sys/p101_mman.h
 )
 set(p101_memory_LINK_LIBRARIES
         p101_error
