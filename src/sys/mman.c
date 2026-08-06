@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include "p101_memory/p101_stdlib.h"
 #include "p101_memory/sys/p101_mman.h"
 #include <p101_env/wrapper.h>
 
