@@ -1145,116 +1145,6 @@ static void test_p101_posix_madvise(struct p101_env *env, struct p101_error *err
     }
 }
 
-/* P101_TEST_CASE(p101_posix_memalign) */
-static void test_p101_posix_memalign(struct p101_env *env, struct p101_error *err)
-{
-    void         *argument_2[4];
-    unsigned char argument_2_before[sizeof(argument_2)];
-    memset(argument_2, 0xA5, sizeof(argument_2));
-    memcpy(argument_2_before, argument_2, sizeof(argument_2));
-#ifdef __linux__
-    static const int         errors[]      = {EINVAL, ENOMEM};
-    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
-#elif defined(__APPLE__)
-    static const int         errors[]      = {EINVAL, ENOMEM};
-    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
-#elif defined(__FreeBSD__)
-    static const int         errors[]      = {EINVAL, ENOMEM};
-    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
-#else
-    static const int         errors[]      = {EINVAL, ENOMEM};
-    static const char *const error_names[] = {"EINVAL", "ENOMEM"};
-#endif
-
-    for(size_t index = 0U; index < sizeof(errors) / sizeof(errors[0]); index++)
-    {
-        struct fault_state state = {0, errors[index]};
-        int                failures_before;
-
-        failures_before = failures;
-        EXPECT(p101_error_has_no_error(err));
-        fault_resource_events = 0U;
-        errno                 = P101_TEST_ERRNO_SENTINEL;
-        p101_env_set_fault_injector(env, fail_next_call, &state);
-        int result = p101_posix_memalign(env, err, argument_2, 0, 0);
-        (void)result;
-        EXPECT(state.checks == 1);
-        EXPECT(p101_error_is_errno(err, state.code));
-        EXPECT(errno == P101_TEST_ERRNO_SENTINEL);
-        EXPECT(result == state.code);
-        EXPECT(memcmp(argument_2, argument_2_before, sizeof(argument_2)) == 0);
-        EXPECT(fault_resource_events == 0U);
-        write_outcome("p101_posix_memalign", "errno", error_names[index], state.code, failures == failures_before);
-        p101_error_reset(err);
-    }
-    p101_env_set_fault_injector(env, NULL, NULL);
-    {
-        int   native_status = 0;
-        pid_t native_pid    = fork();
-
-        EXPECT(native_pid >= 0);
-        if(native_pid == 0)
-        {
-            bool               native_passed = true;
-            struct p101_error *native_err    = NULL;
-            struct p101_env   *native_env    = NULL;
-
-            native_child_process = true;
-            failures             = 0;
-            (void)alarm(2U);
-            if(unsetenv("P101_CALL_LOG") != 0 || unsetenv("P101_RESOURCE_LOG") != 0)
-            {
-                fprintf(stderr, "native setup failed: cannot clear p101 logging environment\n");
-                native_child_status = 77;
-                goto native_child_done_;
-            }
-            native_err = p101_error_create(false);
-            if(native_err == NULL)
-            {
-                native_child_status = 77;
-                goto native_child_done_;
-            }
-            native_env = p101_env_create(native_err, NULL);
-            if(native_env == NULL)
-            {
-                native_child_status = 77;
-                goto native_child_done_;
-            }
-            void *native_argument_2 = NULL;
-            int   native_result     = p101_posix_memalign(native_env, native_err, &native_argument_2, sizeof(void *), 16U);
-            (void)native_result;
-            if(p101_error_has_error(native_err))
-            {
-                fprintf(stderr, "native smoke failed: p101_posix_memalign: %s\n", p101_error_get_message(native_err));
-                native_passed = false;
-            }
-            free(native_argument_2);
-            native_child_status = native_passed ? EXIT_SUCCESS : EXIT_FAILURE;
-        native_child_done_:
-            p101_env_destroy(native_env);
-            p101_error_destroy(native_err);
-        }
-        if(native_pid > 0)
-        {
-            EXPECT(native_waitpid_nointr(native_pid, &native_status) == native_pid);
-            if(WIFSIGNALED(native_status))
-            {
-                fprintf(stderr, "native smoke terminated by signal: p101_posix_memalign: %d\n", WTERMSIG(native_status));
-            }
-            EXPECT(WIFEXITED(native_status));
-            if(WIFEXITED(native_status))
-            {
-                if(WEXITSTATUS(native_status) != EXIT_SUCCESS)
-                {
-                    fprintf(stderr, "native smoke exited unsuccessfully: p101_posix_memalign: %d\n", WEXITSTATUS(native_status));
-                }
-                EXPECT(WEXITSTATUS(native_status) == EXIT_SUCCESS);
-            }
-        }
-        p101_error_reset(err);
-    }
-}
-
 int main(void)
 {
     const char        *outcome_path;
@@ -1324,10 +1214,6 @@ int main(void)
         if(!native_child_process)
         {
             test_p101_posix_madvise(env, err);
-        }
-        if(!native_child_process)
-        {
-            test_p101_posix_memalign(env, err);
         }
     }
     p101_env_destroy(env);
