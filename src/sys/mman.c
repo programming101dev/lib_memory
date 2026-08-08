@@ -15,6 +15,7 @@
  */
 
 #include "p101_memory/sys/p101_mman.h"
+#include <p101_env/resource_classes.h>
 #include <p101_env/wrapper.h>
 
 /*
@@ -50,7 +51,7 @@ void *p101_mmap(const struct p101_env *env, struct p101_error *err, void *addr, 
     }
     else
     {
-        P101_TRACK_POINTER_RESOURCE_ACQUIRE(env, "mapping", ret_val, len, NULL);
+        P101_TRACK_POINTER_RESOURCE_ACQUIRE(env, P101_RESOURCE_CLASS_MAPPING, ret_val, len, NULL);
     }
 
     P101_WRAPPER_DONE(env);
@@ -77,12 +78,10 @@ int p101_mprotect(const struct p101_env *env, struct p101_error *err, void *addr
 
 int p101_munmap(const struct p101_env *env, struct p101_error *err, void *addr, size_t len)
 {
-    char resource_id[P101_ENV_POINTER_RESOURCE_ID_SIZE];
-    int  ret_val;
+    int ret_val;
 
     P101_TRACE(env);
     P101_WRAPPER_FAULT_RETURN(env, err, ret_val, -1);
-    p101_env_pointer_resource_id(resource_id, sizeof(resource_id), addr);
     errno   = 0;
     ret_val = munmap(addr, len);
 
@@ -92,7 +91,12 @@ int p101_munmap(const struct p101_env *env, struct p101_error *err, void *addr, 
     }
     else
     {
-        P101_TRACK_RESOURCE_RELEASE(env, "mapping", resource_id, NULL);
+        /*
+         * P101_TRACK_POINTER_RESOURCE_RELEASE pins size to 0U, so call the
+         * tracking function directly to keep the mapping length in the
+         * release record; p101_mmap() records the same value on acquire.
+         */
+        p101_env_track_pointer_resource(env, P101_ENV_RESOURCE_RELEASE, P101_RESOURCE_CLASS_MAPPING, addr, NULL, len, NULL, __FILE__, __func__, __LINE__);
     }
 
     P101_WRAPPER_DONE(env);
