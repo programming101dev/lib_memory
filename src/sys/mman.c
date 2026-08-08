@@ -78,10 +78,17 @@ int p101_mprotect(const struct p101_env *env, struct p101_error *err, void *addr
 
 int p101_munmap(const struct p101_env *env, struct p101_error *err, void *addr, size_t len)
 {
-    int ret_val;
+    char resource_id[P101_ENV_POINTER_RESOURCE_ID_SIZE];
+    int  ret_val;
 
     P101_TRACE(env);
     P101_WRAPPER_FAULT_RETURN(env, err, ret_val, -1);
+
+    /*
+     * munmap unmaps the pages addr names, so spell the id while the mapping
+     * is still there rather than reading a pointer into unmapped storage.
+     */
+    p101_env_pointer_resource_id(resource_id, sizeof(resource_id), addr);
     errno   = 0;
     ret_val = munmap(addr, len);
 
@@ -92,11 +99,11 @@ int p101_munmap(const struct p101_env *env, struct p101_error *err, void *addr, 
     else
     {
         /*
-         * P101_TRACK_POINTER_RESOURCE_RELEASE pins size to 0U, so call the
-         * tracking function directly to keep the mapping length in the
-         * release record; p101_mmap() records the same value on acquire.
+         * P101_TRACK_RESOURCE_RELEASE pins size to 0U, so call the tracking
+         * function directly to keep the mapping length in the release
+         * record; p101_mmap() records the same value on acquire.
          */
-        p101_env_track_pointer_resource(env, P101_ENV_RESOURCE_RELEASE, P101_RESOURCE_CLASS_MAPPING, addr, NULL, len, NULL, __FILE__, __func__, __LINE__);
+        p101_env_track_resource(env, P101_ENV_RESOURCE_RELEASE, P101_RESOURCE_CLASS_MAPPING, resource_id, NULL, len, NULL, __FILE__, __func__, __LINE__);
     }
 
     P101_WRAPPER_DONE(env);
