@@ -632,8 +632,41 @@ static void test_p101_mprotect(struct p101_env *env, struct p101_error *err)
                 native_child_status = 77;
                 goto native_child_done_;
             }
-            unsigned char native_argument_2[4096] = {0};
-            int           native_result           = p101_mprotect(native_env, native_err, native_argument_2, 0, 0);
+            long   native_argument_2_page_size;
+            size_t native_argument_2_size;
+            FILE  *native_argument_2_stream;
+            int    native_argument_2_fd;
+            int    native_argument_2_truncate_status;
+            void  *native_argument_2;
+            native_argument_2_page_size = sysconf(_SC_PAGESIZE);
+            if(native_argument_2_page_size <= 0)
+            {
+                native_child_status = 77;
+                goto native_child_done_;
+            }
+            native_argument_2_size   = (size_t)native_argument_2_page_size;
+            native_argument_2_stream = tmpfile();
+            if(native_argument_2_stream == NULL)
+            {
+                native_child_status = 77;
+                goto native_child_done_;
+            }
+            native_argument_2_fd              = fileno(native_argument_2_stream);
+            native_argument_2_truncate_status = ftruncate(native_argument_2_fd, (off_t)native_argument_2_size);
+            if(native_argument_2_truncate_status != 0)
+            {
+                P101_NATIVE_CLEANUP_ERRNO(fclose(native_argument_2_stream));
+                native_child_status = 77;
+                goto native_child_done_;
+            }
+            native_argument_2 = mmap(NULL, native_argument_2_size, PROT_READ | PROT_WRITE, MAP_SHARED, native_argument_2_fd, 0);
+            if(native_argument_2 == MAP_FAILED)
+            {
+                P101_NATIVE_CLEANUP_ERRNO(fclose(native_argument_2_stream));
+                native_child_status = 77;
+                goto native_child_done_;
+            }
+            int native_result = p101_mprotect(native_env, native_err, native_argument_2, native_argument_2_size, PROT_READ);
             (void)native_result;
             if(p101_error_has_error(native_err))
             {
@@ -653,6 +686,8 @@ static void test_p101_mprotect(struct p101_env *env, struct p101_error *err)
                 }
                 p101_error_reset(native_err);
             }
+            P101_NATIVE_CLEANUP_ERRNO(munmap(native_argument_2, native_argument_2_size));
+            P101_NATIVE_CLEANUP_ERRNO(fclose(native_argument_2_stream));
             native_child_status = native_passed ? EXIT_SUCCESS : EXIT_FAILURE;
         native_child_done_:
             p101_env_destroy(native_env);
